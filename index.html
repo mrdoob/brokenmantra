@@ -305,7 +305,6 @@
 					fragmentShader: document.getElementById( 'fs-render' ).textContent,
 					blending: THREE.AdditiveBlending,
 					depthWrite: false,
-					// depthTest: false,
 					transparent: true
 
 				} );
@@ -323,13 +322,13 @@
 				*/
 
 				rtPost1 = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter } );
-				rtPost1.generateMipmaps = false;
+				rtPost1.texture.generateMipmaps = false;
 
 				rtPost2 = new THREE.WebGLRenderTarget( window.innerWidth / 8, window.innerHeight / 8, { minFilter: THREE.LinearFilter } );
-				rtPost2.generateMipmaps = false;
+				rtPost2.texture.generateMipmaps = false;
 
 				rtPost3 = new THREE.WebGLRenderTarget( window.innerWidth / 8, window.innerHeight / 8, { minFilter: THREE.LinearFilter } );
-				rtPost3.generateMipmaps = false;
+				rtPost3.texture.generateMipmaps = false;
 
 				copyShader = new GPGPU.CopyShader();
 				blurShader = new GPGPU.BlurShader();
