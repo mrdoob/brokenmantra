@@ -576,6 +576,7 @@
 
 				var element = document.body;
 
+				/*
 				if ( element.requestFullscreen ) {
 
 					element.requestFullscreen();
@@ -593,12 +594,13 @@
 					element.webkitRequestFullscreen();
 
 				}
+				*/
 
 				element.style.cursor = 'none';
 
-				setTimeout( init, 100 );
-
 				audio.play();
+
+				setTimeout( init, 100 );
 
 			} );
 			info.appendChild( start );
