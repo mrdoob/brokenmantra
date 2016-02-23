@@ -7,11 +7,8 @@ var AudioAnalyser = function ( element ) {
 	analyser.fftSize = 32;
 	analyser.connect( context.destination );
 
-	var gain = context.createGain();
-	gain.connect( analyser );
-
 	var source = context.createMediaElementSource( element );
-	source.connect( gain );
+	source.connect( analyser );
 
 	//
 
