@@ -98,7 +98,27 @@
 
 		<script>
 
-			var audio, analyser;
+			var audio = document.createElement( 'audio' );
+			audio.controls = true;
+			audio.style.position = 'absolute';
+			audio.style.left = 'calc(50% - 150px)';
+			audio.style.bottom = '25px';
+			audio.style.display = 'none';
+			audio.style.opacity = 0;
+			audio.style.transition = 'opacity 1s';
+			document.body.appendChild( audio );
+
+			var source = document.createElement( 'source' );
+			source.src = 'BROKEN MANTRA.ogg';
+			source.type = 'audio/ogg';
+			audio.appendChild( source );
+
+			var source = document.createElement( 'source' );
+			source.src = 'BROKEN MANTRA.mp3';
+			source.type = 'audio/mpeg';
+			audio.appendChild( source );
+
+			var analyser;
 
 			var scene, camera, renderer;
 			var particleMaterial;
@@ -321,28 +341,6 @@
 
 				//
 
-				audio = document.createElement( 'audio' );
-				audio.controls = true;
-				audio.style.position = 'absolute';
-				audio.style.left = 'calc(50% - 150px)';
-				audio.style.bottom = '25px';
-				audio.style.display = 'none';
-				audio.style.opacity = 0;
-				audio.style.transition = 'opacity 1s';
-				audio.onloadedmetadata = animate;
-				audio.play();
-				document.body.appendChild( audio );
-
-				var source = document.createElement( 'source' );
-				source.src = 'BROKEN MANTRA.ogg';
-				source.type = 'audio/ogg';
-				audio.appendChild( source );
-
-				var source = document.createElement( 'source' );
-				source.src = 'BROKEN MANTRA.mp3';
-				source.type = 'audio/mpeg';
-				audio.appendChild( source );
-
 				var timeoutID;
 
 				var showControls = function ( event ) {
@@ -369,10 +367,11 @@
 				document.addEventListener( 'touchstart', showControls );
 
 				analyser = new AudioAnalyser( audio );
-				AudioAnalyser.mark = 75;
 
 				audio.style.display = '';
 				renderer.domElement.style.display = '';
+
+				animate();
 
 			}
 
@@ -598,6 +597,8 @@
 				element.style.cursor = 'none';
 
 				setTimeout( init, 100 );
+
+				audio.play();
 
 			} );
 			info.appendChild( start );
