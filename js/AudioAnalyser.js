@@ -17,13 +17,13 @@ var AudioAnalyser = function ( element ) {
 
 	var frequencyData = new Uint8Array( analyser.frequencyBinCount );
 
-	var debug = false;
+	var debug = location.search === '?debug';
 
 	if ( debug ) {
 
 		var canvas = document.createElement( 'canvas' );
-		canvas.width = 512;
-		canvas.height = 256;
+		canvas.width = 128;
+		canvas.height = 64;
 		canvas.style.position = 'absolute';
 		canvas.style.top = '0';
 		canvas.style.left = '0';
@@ -31,13 +31,15 @@ var AudioAnalyser = function ( element ) {
 
 		var context = canvas.getContext( '2d' );
 
-		var barSize = canvas.width / analyser.fftSize;
+		var bar = {
+			width: canvas.width / analyser.frequencyBinCount,
+			height: canvas.height
+		};
 
 	}
 
 	return {
 
-		mark: 0,
 		getFrequency: function () {
 
 			return frequencyData;
@@ -49,15 +51,15 @@ var AudioAnalyser = function ( element ) {
 
 			if ( debug ) {
 
-				context.fillStyle = 'blue';
+				context.fillStyle = 'darkblue';
 				context.fillRect( 0, 0, canvas.width, canvas.height );
 
-				context.fillStyle = 'red';
+				context.fillStyle = 'blue';
 
 				for ( var i = 0; i < frequencyData.length; i ++ ) {
 
 					var frequency = frequencyData[ i ];
-					context.fillRect( i * barSize, 256 - frequency, barSize - 1, frequency );
+					context.fillRect( i * bar.width, ( 1 - ( frequency / 256 ) ) * bar.height, bar.width - 1, ( frequency / 256 ) * bar.height );
 
 				}
 
