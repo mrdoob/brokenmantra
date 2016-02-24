@@ -38,6 +38,8 @@
 	<body>
 
 		<script src="js/three.min.js"></script>
+		<script src="js/CardboardEffect.js"></script>
+		<script src="js/DeviceOrientationControls.js"></script>
 
 		<script src="js/GPGPU.js"></script>
 		<script src="js/gpgpu/SimulationShader.js"></script>
@@ -114,10 +116,10 @@
 			var analyser;
 
 			var scene, camera, renderer;
-			var particleMaterial;
+			var particleMaterial, lineMaterial;
 			var wireframe;
 
-			var lineMaterial;
+			var dolly;
 
 			var gpgpu, simulationShader;
 			var copyShader, blurShader, mixShader;
@@ -126,6 +128,9 @@
 			var rtPost1, rtPost2, rtPost3;
 
 			var count = 0;
+
+			var CARDBOARD = location.search === '?cardboard';
+			var controls, effect;
 
 			function init() {
 
@@ -172,11 +177,14 @@
 
 				}
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
-				camera.position.z = 500;
-
 				scene = new THREE.Scene();
-				scene.add( camera );
+
+				dolly = new THREE.Camera();
+				scene.add( dolly );
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 300 );
+				camera.focalLength = 200;
+				dolly.add( camera );
 
 				//
 
@@ -350,6 +358,15 @@
 				blurShader = new GPGPU.BlurShader();
 				mixShader = new GPGPU.MixShader();
 
+				if ( CARDBOARD ) {
+
+					effect = new THREE.CardboardEffect( renderer );
+					effect.setSize( window.innerWidth, window.innerHeight );
+
+					controls = new THREE.DeviceOrientationControls( camera );
+
+				}
+
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -398,13 +415,13 @@
 				rtPost2.setSize( window.innerWidth / 8, window.innerHeight / 8 );
 				rtPost3.setSize( window.innerWidth / 8, window.innerHeight / 8 );
 
-				// meh, renderTargets can't resize
-
-				rtPost1 = rtPost1.clone();
-				rtPost2 = rtPost2.clone();
-				rtPost3 = rtPost3.clone();
-
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				if ( CARDBOARD ) {
+
+					effect.setSize( window.innerWidth, window.innerHeight );
+
+				}
 
 			}
 
@@ -463,61 +480,61 @@
 					var progress = timer / 52.5;
 					var distance = THREE.Math.mapLinear( timer, 0, 52.5, 350, 180 );
 
-					// camera.position.x = - Math.cos( timer * 0.01 ) * distance;
-					// camera.position.z = Math.sin( timer * 0.01 ) * distance;
-					camera.position.z = distance;
-					camera.lookAt( scene.position );
-					camera.rotation.z = timer / 20;
+					// dolly.position.x = - Math.cos( timer * 0.01 ) * distance;
+					// dolly.position.z = Math.sin( timer * 0.01 ) * distance;
+					dolly.position.z = distance;
+					dolly.lookAt( scene.position );
+					dolly.rotation.z = timer / 20;
 
 				} else if ( timer < 72.5 ) {
 
 					var distance = THREE.Math.mapLinear( timer, 52.5, 92.6, 140, 80 );
 
-					camera.position.x = - Math.cos( timer * 0.03 ) * distance;
-					camera.position.z = Math.sin( timer * 0.03 ) * distance;
-					camera.lookAt( scene.position );
-					camera.rotation.z = timer / 20;
+					dolly.position.x = - Math.cos( timer * 0.03 ) * distance;
+					dolly.position.z = Math.sin( timer * 0.03 ) * distance;
+					dolly.lookAt( scene.position );
+					dolly.rotation.z = timer / 20;
 
 				} else if ( timer < 92.65 ) {
 
 					var distance = THREE.Math.mapLinear( timer, 52.5, 92.65, 120, 50 );
 
-					camera.position.x = - Math.cos( timer * 0.03 ) * distance;
-					camera.position.z = Math.sin( timer * 0.03 ) * distance;
-					camera.lookAt( scene.position );
-					camera.rotation.z = timer / 20;
+					dolly.position.x = - Math.cos( timer * 0.03 ) * distance;
+					dolly.position.z = Math.sin( timer * 0.03 ) * distance;
+					dolly.lookAt( scene.position );
+					dolly.rotation.z = timer / 20;
 
 				} else if ( timer < 113.1 ) {
 
 					var distance = THREE.Math.mapLinear( timer, 92.6, 113.1, 20, 240 );
 
-					camera.position.x = distance; // - Math.cos( timer * 0.03 ) * distance;
-					camera.position.y = 0;
-					camera.position.z = - 175;
+					dolly.position.x = distance; // - Math.cos( timer * 0.03 ) * distance;
+					dolly.position.y = 0;
+					dolly.position.z = - 175;
 
-					camera.lookAt( new THREE.Vector3( 0, 0, - 175 ) );
-					camera.rotation.z = timer / 20;
+					dolly.lookAt( new THREE.Vector3( 0, 0, - 175 ) );
+					dolly.rotation.z = timer / 20;
 
 				} else if ( timer < 143.2 ) {
 
 					var progress = THREE.Math.mapLinear( timer, 113.1, 143.2, 1, 0 );
 
-					camera.position.x = Math.sin( timer * 0.037 ) * 200;
-					camera.position.y = 0;
-					camera.position.z = Math.cos( timer * 0.037 ) * 200;
-					camera.lookAt( new THREE.Vector3( 0, 50, - 250 * progress ) );
-					camera.rotation.z = timer / 20;
+					dolly.position.x = Math.sin( timer * 0.037 ) * 200;
+					dolly.position.y = 0;
+					dolly.position.z = Math.cos( timer * 0.037 ) * 200;
+					dolly.lookAt( new THREE.Vector3( 0, 50, - 250 * progress ) );
+					dolly.rotation.z = timer / 20;
 
 				} else if ( timer < 144.5 ) {
 
-					camera.position.x = 10000;
+					dolly.position.x = 10000;
 
 				} else {
 
-					camera.position.x = ( Math.cos( timer * 0.03 ) * 50 );
-					camera.position.z = ( Math.sin( timer * 0.03 ) * 50 ) - 350;
-					camera.lookAt( new THREE.Vector3( 0, 0, - 350 ) );
-					camera.rotation.z = timer / 20;
+					dolly.position.x = ( Math.cos( timer * 0.03 ) * 50 );
+					dolly.position.z = ( Math.sin( timer * 0.03 ) * 50 ) - 350;
+					dolly.lookAt( new THREE.Vector3( 0, 0, - 350 ) );
+					dolly.rotation.z = timer / 20;
 
 				}
 
@@ -556,9 +573,19 @@
 
 				count ++;
 
+				if ( CARDBOARD ) {
+
+					controls.update();
+					effect.render( scene, camera, rtPost1 );
+
+				} else {
+
+					gpgpu.render( scene, camera, rtPost1 );
+
+				}
+
 				// post processing
 
-				gpgpu.render( scene, camera, rtPost1 );
 				gpgpu.pass( copyShader.setTexture( rtPost1 ), rtPost2 );
 
 				for ( var i = 0; i < 16; i ++ ) {
