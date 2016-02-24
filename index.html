@@ -84,7 +84,6 @@
 
 			void main() {
 
-				if ( opacity < 0.1 ) discard;
 				gl_FragColor = vec4( pointColor + vPosition * 0.002, opacity );
 
 			}
@@ -182,7 +181,7 @@
 				dolly = new THREE.Camera();
 				scene.add( dolly );
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 300 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 400 );
 				camera.focalLength = 200;
 				dolly.add( camera );
 
