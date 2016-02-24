@@ -181,7 +181,7 @@
 				dolly = new THREE.Camera();
 				scene.add( dolly );
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 400 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 400 );
 				camera.focalLength = 200;
 				dolly.add( camera );
 
