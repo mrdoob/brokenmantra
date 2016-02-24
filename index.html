@@ -30,13 +30,6 @@
 
 				overflow: hidden;
 			}
-			a {
-				color: #00ff22;
-			}
-			hr {
-				border-color: #333;
-				margin: 20px 0px;
-			}
 			#info {
 				text-align: center;
 			}
@@ -137,8 +130,30 @@
 			function init() {
 
 				renderer = new THREE.WebGLRenderer( { antialias: false, stencil: false } );
-				renderer.domElement.style.display = 'none';
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.domElement.addEventListener( 'dblclick', function ( event ) {
+
+					var element = document.body;
+
+					if ( element.requestFullscreen ) {
+
+						element.requestFullscreen();
+
+					} else if ( element.msRequestFullscreen ) {
+
+						element.msRequestFullscreen();
+
+					} else if ( element.mozRequestFullScreen ) {
+
+						element.mozRequestFullScreen();
+
+					} else if ( element.webkitRequestFullscreen ) {
+
+						element.webkitRequestFullscreen();
+
+					}
+
+				} );
 				document.body.appendChild( renderer.domElement );
 
 				var gl = renderer.context;
@@ -369,7 +384,6 @@
 				analyser = new AudioAnalyser( audio );
 
 				audio.style.display = '';
-				renderer.domElement.style.display = '';
 
 				animate();
 
@@ -562,7 +576,6 @@
 
 			var info = document.createElement( 'div' );
 			info.id = 'info';
-			// info.innerHTML = '"Sporel" by Mr.doob<br /><span style="font-size:18px">music: <a href="https://soundcloud.com/frank-bolero/sporel-mix" target="_blank">Rymdlego - Sporel (Frank Bolero Ambient mix)</a></span><hr />';
 			document.body.appendChild( info );
 
 			var start = document.createElement( 'span' );
@@ -572,31 +585,8 @@
 			start.style.margin = '20px';
 			start.addEventListener( 'click', function ( event ) {
 
+				document.body.style.cursor = 'none';
 				info.style.display = 'none';
-
-				var element = document.body;
-
-				/*
-				if ( element.requestFullscreen ) {
-
-					element.requestFullscreen();
-
-				} else if ( element.msRequestFullscreen ) {
-
-					element.msRequestFullscreen();
-
-				} else if ( element.mozRequestFullScreen ) {
-
-					element.mozRequestFullScreen();
-
-				} else if ( element.webkitRequestFullscreen ) {
-
-					element.webkitRequestFullscreen();
-
-				}
-				*/
-
-				element.style.cursor = 'none';
 
 				audio.play();
 
