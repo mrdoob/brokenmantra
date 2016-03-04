@@ -38,8 +38,10 @@
 	<body>
 
 		<script src="js/three.min.js"></script>
-		<script src="js/CardboardEffect.js"></script>
-		<script src="js/DeviceOrientationControls.js"></script>
+
+		<script src="js/WebVR.js"></script>
+		<script src="js/ModifiedVREffect.js"></script>
+		<script src="js/VRControls.js"></script>
 
 		<script src="js/GPGPU.js"></script>
 		<script src="js/gpgpu/SimulationShader.js"></script>
@@ -92,6 +94,8 @@
 
 		<script>
 
+			if ( location.search === '?webvr' ) WEBVR.test();
+
 			var audio = document.createElement( 'audio' );
 			audio.controls = true;
 			audio.style.position = 'absolute';
@@ -128,13 +132,27 @@
 
 			var count = 0;
 
-			var CARDBOARD = location.search === '?cardboard';
+			var WEBVR = location.search === '?webvr';
 			var controls, effect;
+
+			//
+
+			renderer = new THREE.WebGLRenderer( { antialias: false, stencil: false } );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+			camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 400 );
+
+			if ( WEBVR ) {
+
+				effect = new THREE.VREffect( renderer );
+				effect.setSize( window.innerWidth, window.innerHeight );
+
+				controls = new THREE.VRControls( camera );
+
+			}
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer( { antialias: false, stencil: false } );
-				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.domElement.addEventListener( 'dblclick', function ( event ) {
 
 					var element = document.body;
@@ -179,11 +197,9 @@
 				scene = new THREE.Scene();
 
 				dolly = new THREE.Camera();
-				scene.add( dolly );
-
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 400 );
-				camera.focalLength = 200;
 				dolly.add( camera );
+
+				scene.add( dolly );
 
 				//
 
@@ -357,12 +373,10 @@
 				blurShader = new GPGPU.BlurShader();
 				mixShader = new GPGPU.MixShader();
 
-				if ( CARDBOARD ) {
+				if ( WEBVR ) {
 
-					effect = new THREE.CardboardEffect( renderer );
-					effect.setSize( window.innerWidth, window.innerHeight );
-
-					controls = new THREE.DeviceOrientationControls( camera );
+					effect.requestPresent();
+					controls.resetSensor();
 
 				}
 
@@ -416,7 +430,7 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				if ( CARDBOARD ) {
+				if ( WEBVR ) {
 
 					effect.setSize( window.innerWidth, window.innerHeight );
 
@@ -572,29 +586,29 @@
 
 				count ++;
 
-				if ( CARDBOARD ) {
+				if ( WEBVR ) {
 
 					controls.update();
-					effect.render( scene, camera, rtPost1 );
+					effect.render( scene, camera );
 
 				} else {
 
 					gpgpu.render( scene, camera, rtPost1 );
 
+					// post processing
+
+					gpgpu.pass( copyShader.setTexture( rtPost1 ), rtPost2 );
+
+					for ( var i = 0; i < 16; i ++ ) {
+
+						gpgpu.pass( blurShader.setTexture( rtPost2 ).setDelta( 1 / rtPost2.width,  0 ), rtPost3 );
+						gpgpu.pass( blurShader.setTexture( rtPost3 ).setDelta( 0, 1 / rtPost2.height ), rtPost2 );
+
+					}
+
+					gpgpu.out( mixShader.setTextures( rtPost1, rtPost2 ) );
+
 				}
-
-				// post processing
-
-				gpgpu.pass( copyShader.setTexture( rtPost1 ), rtPost2 );
-
-				for ( var i = 0; i < 16; i ++ ) {
-
-					gpgpu.pass( blurShader.setTexture( rtPost2 ).setDelta( 1 / rtPost2.width,  0 ), rtPost3 );
-					gpgpu.pass( blurShader.setTexture( rtPost3 ).setDelta( 0, 1 / rtPost2.height ), rtPost2 );
-
-				}
-
-				gpgpu.out( mixShader.setTextures( rtPost1, rtPost2 ) );
 
 			}
 
@@ -616,7 +630,7 @@
 
 				audio.play();
 
-				setTimeout( init, 100 );
+				init();
 
 			} );
 			info.appendChild( start );
