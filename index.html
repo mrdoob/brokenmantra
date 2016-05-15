@@ -40,8 +40,8 @@
 		<script src="js/three.min.js"></script>
 
 		<script src="js/WebVR.js"></script>
-		<script src="js/ModifiedVREffect.js"></script>
 		<script src="js/VRControls.js"></script>
+		<script src="js/ModifiedVREffect.js"></script>
 
 		<script src="js/GPGPU.js"></script>
 		<script src="js/gpgpu/SimulationShader.js"></script>
@@ -94,7 +94,17 @@
 
 		<script>
 
-			if ( location.search === '?webvr' ) WEBVR.test();
+			var isWebVR = location.search === '?webvr';
+
+			if ( isWebVR ) {
+
+				if ( WEBVR.isLatestAvailable() === false ) {
+
+					document.body.appendChild( WEBVR.getMessage() );
+
+				}
+
+			}
 
 			var audio = document.createElement( 'audio' );
 			audio.controls = true;
@@ -132,7 +142,6 @@
 
 			var count = 0;
 
-			var WEBVR = location.search === '?webvr';
 			var controls, effect;
 
 			//
@@ -142,12 +151,17 @@
 
 			camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 400 );
 
-			if ( WEBVR ) {
+			if ( isWebVR ) {
 
+				controls = new THREE.VRControls( camera );
 				effect = new THREE.VREffect( renderer );
 				effect.setSize( window.innerWidth, window.innerHeight );
 
-				controls = new THREE.VRControls( camera );
+				if ( WEBVR.isAvailable() === true ) {
+
+					document.body.appendChild( WEBVR.getButton( effect ) );
+
+				}
 
 			}
 
@@ -373,9 +387,8 @@
 				blurShader = new GPGPU.BlurShader();
 				mixShader = new GPGPU.MixShader();
 
-				if ( WEBVR ) {
+				if ( isWebVR ) {
 
-					effect.requestPresent();
 					controls.resetSensor();
 
 				}
@@ -430,7 +443,7 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				if ( WEBVR ) {
+				if ( isWebVR ) {
 
 					effect.setSize( window.innerWidth, window.innerHeight );
 
@@ -586,7 +599,7 @@
 
 				count ++;
 
-				if ( WEBVR ) {
+				if ( isWebVR ) {
 
 					controls.update();
 					effect.render( scene, camera );
