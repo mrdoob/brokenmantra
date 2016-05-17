@@ -56,6 +56,8 @@
 
 			uniform sampler2D map;
 
+			uniform float pointSize;
+
 			uniform float size;
 
 			varying vec3 vPosition;
@@ -70,7 +72,7 @@
 				vPosition = data.xyz;
 				opacity = data.w;
 
-				gl_PointSize = data.w * 0.75 + 0.5; // * 0.75;
+				gl_PointSize = ( data.w + 1.0 ) * pointSize;
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( vPosition, 1.0 );
 
 			}
@@ -86,7 +88,10 @@
 
 			void main() {
 
-				gl_FragColor = vec4( pointColor + vPosition * 0.002, opacity );
+				vec3 color = pointColor + vPosition * 0.002;
+				vec3 circle = vec3( 1.0 - length( gl_PointCoord.xy - 0.5 ) * 2.0 );
+
+				gl_FragColor = vec4( min( color, circle ), opacity );
 
 			}
 
@@ -351,7 +356,8 @@
 						"map": { type: "t", value: rtTexturePos },
 						"size": { type: "f", value: size },
 
-						"pointColor": { type: "v3", value: new THREE.Vector3() }
+						"pointColor": { type: "v3", value: new THREE.Vector3() },
+						"pointSize": { type: "f", value: window.innerHeight / 600 }
 
 					},
 					vertexShader: document.getElementById( 'vs-render' ).textContent,
@@ -442,6 +448,8 @@
 				rtPost3.setSize( window.innerWidth / 8, window.innerHeight / 8 );
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				particleMaterial.uniforms.pointSize.value = window.innerHeight / 600;
 
 				if ( isWebVR ) {
 
