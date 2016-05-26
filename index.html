@@ -22,7 +22,6 @@
 
 				color: #fff;
 
-				font-size: 24px;
 				font-family: Serif;
 				font-style: italic;
 
@@ -30,12 +29,43 @@
 
 				overflow: hidden;
 			}
+			a {
+				color: #00f;
+				text-decoration: none;
+			}
+			hr {
+				border: 0;
+				border-top: 1px solid #333;
+				margin: 40px 0px;
+			}
 			#info {
 				text-align: center;
+			}
+			#title {
+				font-size: 36px;
+				margin: 10px;
+			}
+			#meta {
+				font-size: 16px;
+			}
+			#start {
+				display: inline-block;
+				border: 1px solid #ff0044;
+				color: #ff0044;
+				cursor: pointer;
+				font-size: 18px;
+				padding: 8px 16px;
 			}
 		</style>
 	</head>
 	<body>
+
+		<div id="info">
+			<div id="title">Broken Mantra</div>
+			<div id="meta">(from <a href="https://lorn.bandcamp.com/album/vessel" target="_blank">VESSEL</a> by <a href="http://lorn.bandcamp.com/" target="_blank">LORN</a>)</div>
+			<hr />
+			<div id="start">START</div>
+		</div>
 
 		<script src="js/three.min.js"></script>
 
@@ -635,15 +665,8 @@
 
 			//
 
-			var info = document.createElement( 'div' );
-			info.id = 'info';
-			document.body.appendChild( info );
-
-			var start = document.createElement( 'span' );
-			start.textContent = 'START';
-			start.style.color = '#ff0044';
-			start.style.cursor = 'pointer';
-			start.style.margin = '20px';
+			var info = document.getElementById( 'info' );
+			var start = document.getElementById( 'start' );
 			start.addEventListener( 'click', function ( event ) {
 
 				document.body.style.cursor = 'none';
@@ -654,7 +677,6 @@
 				init();
 
 			} );
-			info.appendChild( start );
 
 		</script>
 	</body>
