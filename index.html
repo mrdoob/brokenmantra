@@ -3,7 +3,7 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 		<title>Broken Mantra</title>
 		<style>
 			html {
@@ -653,8 +653,6 @@
 
 			//
 
-			var wakeLock = null;
-
 			var info = document.getElementById( 'info' );
 			var start = document.getElementById( 'start' );
 			start.addEventListener( 'click', async function ( event ) {
@@ -668,7 +666,7 @@
 
 					try {
 
-						wakeLock = await navigator.wakeLock.request( 'screen' );
+						await navigator.wakeLock.request( 'screen' );
 
 					} catch ( err ) {}
 
