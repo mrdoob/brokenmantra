@@ -653,15 +653,27 @@
 
 			//
 
+			var wakeLock = null;
+
 			var info = document.getElementById( 'info' );
 			var start = document.getElementById( 'start' );
-			start.addEventListener( 'click', function ( event ) {
+			start.addEventListener( 'click', async function ( event ) {
 
 				document.body.style.cursor = 'none';
 				info.style.display = 'none';
 
 				audio.play();
 
+				if ( 'wakeLock' in navigator ) {
+
+					try {
+
+						wakeLock = await navigator.wakeLock.request( 'screen' );
+
+					} catch ( err ) {}
+
+				}
+				
 				init();
 
 			} );
